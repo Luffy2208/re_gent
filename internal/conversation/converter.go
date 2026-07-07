@@ -138,16 +138,16 @@ func parseContent(role string, content json.RawMessage) (ConversationMessage, er
 
 // FormatConversation formats full conversation including user, assistant, and tool calls
 // Returns empty string if no messages found
-func FormatConversation(messages []ConversationMessage, indent string) string {
-	return formatConversationInternal(messages, indent, "", "", "")
+func FormatConversation(styler *style.Styler, messages []ConversationMessage, indent string) string {
+	return formatConversationInternal(styler, messages, indent, "", "", "")
 }
 
 // FormatConversationWithHash formats conversation with step hash and graph prefix on each line
-func FormatConversationWithHash(messages []ConversationMessage, graphPrefix, stepHash, timestamp string) string {
-	return formatConversationInternal(messages, "", graphPrefix, stepHash, timestamp)
+func FormatConversationWithHash(styler *style.Styler, messages []ConversationMessage, graphPrefix, stepHash, timestamp string) string {
+	return formatConversationInternal(styler, messages, "", graphPrefix, stepHash, timestamp)
 }
 
-func formatConversationInternal(messages []ConversationMessage, indent, graphPrefix, stepHash, timestamp string) string {
+func formatConversationInternal(styler *style.Styler, messages []ConversationMessage, indent, graphPrefix, stepHash, timestamp string) string {
 	if len(messages) == 0 {
 		return ""
 	}
@@ -158,7 +158,7 @@ func formatConversationInternal(messages []ConversationMessage, indent, graphPre
 	if stepHash != "" {
 		subtitle := stepHash
 		if timestamp != "" {
-			subtitle += style.DimText(" • " + timestamp)
+			subtitle += styler.DimText(" • " + timestamp)
 		}
 		output.WriteString(graphPrefix + subtitle + "\n")
 	}
@@ -205,9 +205,9 @@ func formatConversationInternal(messages []ConversationMessage, indent, graphPre
 						prefix = "└─"
 					}
 					if stepHash != "" {
-						output.WriteString("      " + prefix + " " + formatToolUse(tool, "         ") + "\n")
+						output.WriteString("      " + prefix + " " + formatToolUse(styler, tool, "         ") + "\n")
 					} else {
-						output.WriteString(indent + "  " + prefix + " " + formatToolUse(tool, indent+"     ") + "\n")
+						output.WriteString(indent + "  " + prefix + " " + formatToolUse(styler, tool, indent+"     ") + "\n")
 					}
 				}
 			}
@@ -232,9 +232,9 @@ func formatText(text string, indent string, maxLen int) string {
 }
 
 // formatToolUse formats a tool invocation with key arguments
-func formatToolUse(tool ToolUse, indent string) string {
+func formatToolUse(styler *style.Styler, tool ToolUse, indent string) string {
 	var parts []string
-	parts = append(parts, style.ToolName(tool.Name))
+	parts = append(parts, styler.ToolName(tool.Name))
 
 	// Add key arguments
 	if len(tool.Input) > 0 {
@@ -247,7 +247,7 @@ func formatToolUse(tool ToolUse, indent string) string {
 					valStr = valStr[:57] + "..."
 				}
 				if key == "file_path" || key == "path" || key == "filename" {
-					valStr = style.FilePath(valStr)
+					valStr = styler.FilePath(valStr)
 				}
 				args = append(args, fmt.Sprintf("%s: %s", key, valStr))
 			}

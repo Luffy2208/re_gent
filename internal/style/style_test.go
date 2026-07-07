@@ -111,3 +111,43 @@ func TestBoldHash(t *testing.T) {
 		t.Errorf("BoldHash() = %q, expected bold code", got)
 	}
 }
+
+func TestStyler_New(t *testing.T) {
+	s1 := New(true)
+	if !s1.noColor {
+		t.Error("New(true) did not set noColor to true")
+	}
+
+	s2 := New(false)
+	if s2.noColor {
+		t.Error("New(false) did not set noColor to false")
+	}
+}
+
+func TestStyler_MethodsWithColor(t *testing.T) {
+	s := New(false)
+
+	txt := s.BoldText("hello")
+	if !strings.Contains(txt, Bold) {
+		t.Errorf("expected styled text when noColor is false, got %q", txt)
+	}
+
+	txt = s.FilePath("src/main.go")
+	if !strings.Contains(txt, Underline) {
+		t.Errorf("FilePath() = %q, expected it to contain Underline code", txt)
+	}
+}
+
+func TestStyler_MethodsNoColor(t *testing.T) {
+	s := New(true)
+
+	txt := s.BoldText("hello")
+	if txt != "hello" {
+		t.Errorf("expected plain 'hello' when noColor is true, got %q", txt)
+	}
+
+	txt = s.FilePath("src/main.go")
+	if txt != "src/main.go" {
+		t.Errorf("FilePath() = %q, expected plain text", txt)
+	}
+}

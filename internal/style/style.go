@@ -179,3 +179,140 @@ func Deletion(text string) string {
 func BoldText(text string) string {
 	return stylize(Bold, text)
 }
+
+// Styler is an instance-based text styler that does not mutate global state.
+type Styler struct {
+	noColor bool
+}
+
+// New creates a new Styler instance.
+func New(noColor bool) *Styler {
+	return &Styler{noColor: noColor}
+}
+
+func (s *Styler) stylize(style, text string) string {
+	if s.noColor || text == "" {
+		return text
+	}
+	return style + text + Reset
+}
+
+func (s *Styler) Brand(text string) string {
+	if text == "" {
+		text = "re_gent"
+	}
+	return s.stylize(Purple256, text)
+}
+
+func (s *Styler) Title(text string) string {
+	return s.stylize(Bold, text)
+}
+
+func (s *Styler) Label(text string) string {
+	return s.stylize(Blue256, text)
+}
+
+func (s *Styler) Value(text string) string {
+	return text
+}
+
+func (s *Styler) DimText(text string) string {
+	return s.stylize(Dim, text)
+}
+
+func (s *Styler) Success(text string) string {
+	check := s.stylize(Green256, "✓")
+	if text == "" {
+		return check
+	}
+	return check + " " + text
+}
+
+func (s *Styler) Error(text string) string {
+	x := s.stylize(Red256, "✗")
+	if text == "" {
+		return x
+	}
+	return x + " " + text
+}
+
+func (s *Styler) Warning(text string) string {
+	warn := s.stylize(Amber256, "⚠")
+	if text == "" {
+		return warn
+	}
+	return warn + " " + text
+}
+
+func (s *Styler) Hash(text string) string {
+	return text
+}
+
+func (s *Styler) Timestamp(text string) string {
+	return s.stylize(Dim, text)
+}
+
+func (s *Styler) Divider(text string) string {
+	if text == "" {
+		text = strings.Repeat("━", 60)
+	}
+	return s.stylize(Dim, text)
+}
+
+func (s *Styler) DividerFull(text string) string {
+	if text == "" {
+		text = strings.Repeat("━", 70)
+	}
+	return s.stylize(Dim, text)
+}
+
+func (s *Styler) SectionHeader(text string) string {
+	prefix := s.stylize(Dim, "━━━")
+	return prefix + " " + s.stylize(Bold, text)
+}
+
+func (s *Styler) SectionDivider(text string) string {
+	left := s.stylize(Dim, "═══")
+	right := s.stylize(Dim, "═══")
+	return left + " " + text + " " + right
+}
+
+func (s *Styler) Prompt(question, options string) string {
+	if options == "" {
+		return question
+	}
+	return question + " " + s.stylize(Dim, options)
+}
+
+func (s *Styler) BoldHash(text string) string {
+	return s.stylize(Bold, text)
+}
+
+func (s *Styler) FilePath(text string) string {
+	return s.stylize(Underline, text)
+}
+
+func (s *Styler) ToolName(name string) string {
+	switch name {
+	case "Edit":
+		return s.stylize(Amber256, name)
+	case "Write":
+		return s.stylize(Green256, name)
+	case "Bash":
+		return s.stylize(Blue256, name)
+	default:
+		return s.stylize(Blue256, name)
+	}
+}
+
+func (s *Styler) Addition(text string) string {
+	return s.stylize(Green256, text)
+}
+
+func (s *Styler) Deletion(text string) string {
+	return s.stylize(Red256, text)
+}
+
+func (s *Styler) BoldText(text string) string {
+	return s.stylize(Bold, text)
+}

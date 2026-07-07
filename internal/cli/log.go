@@ -105,12 +105,11 @@ func LogCmd() *cobra.Command {
 				formatter = &DefaultFormatter{}
 			}
 
-			if noColor {
-				style.SetNoColor(true)
-			}
+			disableColor := noColor || os.Getenv("NO_COLOR") != ""
+			styler := style.New(disableColor)
 
 			// Format and output
-			return formatter.Format(enriched, sessionID, conversation, files, os.Stdout)
+			return formatter.Format(styler, enriched, sessionID, conversation, files, os.Stdout)
 		},
 	}
 
